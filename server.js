@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from "express";
 import productoRoutes from "./routes/productoRoutes.js";
 import { sequelize } from "./config/db.js";

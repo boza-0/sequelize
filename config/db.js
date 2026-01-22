@@ -1,12 +1,12 @@
 import { Sequelize } from "sequelize";
 
 export const sequelize = new Sequelize(
-  "api_rest_db",
-  "root",
-  "", // empty string if MySQL has no password
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASSWORD,
   {
-    host: "localhost",
-    port: 3306,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
     dialect: "mysql",
     logging: false
   }
