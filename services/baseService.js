@@ -22,7 +22,7 @@ export class BaseService {
     return item;
   }
 
-  async delete(id) {
+  async remove(id) {
     const item = await this.model.findByPk(id);
     if (!item) return null;
     await item.destroy();

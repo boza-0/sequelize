@@ -12,78 +12,99 @@ fs.mkdirSync(controllersPath, { recursive: true });
 fs.mkdirSync(controllersBasePath, { recursive: true });
 fs.mkdirSync(routesPath, { recursive: true });
 
-const files = fs
+const modelFiles = fs
   .readdirSync(modelsPath)
-  .filter((f) => f.endsWith(".js") && !f.toLowerCase().includes("init-models"));
+  .filter(
+    (f) =>
+      f.endsWith(".js") &&
+      !f.toLowerCase().includes("init-models")
+  );
 
-const toPascalFromFile = (file) => {
-  const base = path.basename(file, ".js"); // productos
-  return base.charAt(0).toUpperCase() + base.slice(1); // Productos
-};
+const toPascal = (name) =>
+  name.charAt(0).toUpperCase() + name.slice(1);
 
-const toSingular = (plural) => plural.replace(/s$/, "");
+for (const file of modelFiles) {
+  const resource = path.basename(file, ".js"); // productos
+  const Resource = toPascal(resource);          // Productos
 
-for (const file of files) {
-  const modelFileBase = path.basename(file, ".js"); // productos
-  const ModelName = toPascalFromFile(file); // Productos
-  const singular = toSingular(modelFileBase); // producto
-
-  // ---- SERVICE (siempre regenerable)
+  /* =========================
+     SERVICE (regenerable)
+     ========================= */
   const serviceContent = `import { BaseService } from "./baseService.js";
-import { ${ModelName.slice(0, -1)} as ${ModelName.slice(0, -1)}Model } from "../models/${file}";
+import { ${Resource} } from "../models/${file}";
 
-export const ${modelFileBase}Service = new BaseService(${ModelName.slice(0, -1)}Model);
+export const ${resource}Service = new BaseService(${Resource});
 `;
-  fs.writeFileSync(path.join(servicesPath, `${modelFileBase}Service.js`), serviceContent);
 
-  // ---- BASE CONTROLLER (siempre regenerable)
-  const baseControllerContent = `import { BaseController } from "./baseController.js";
-import { ${modelFileBase}Service } from "../../services/${modelFileBase}Service.js";
-
-export const ${modelFileBase}BaseController = new BaseController(${modelFileBase}Service);
-`;
   fs.writeFileSync(
-    path.join(controllersBasePath, `${modelFileBase}BaseController.js`),
+    path.join(servicesPath, `${resource}Service.js`),
+    serviceContent
+  );
+
+  /* =========================
+     BASE CONTROLLER (regenerable)
+     ========================= */
+  const baseControllerContent = `import { BaseController } from "./baseController.js";
+import { ${resource}Service } from "../../services/${resource}Service.js";
+
+export const ${resource}BaseController = new BaseController(${resource}Service);
+`;
+
+  fs.writeFileSync(
+    path.join(controllersBasePath, `${resource}BaseController.js`),
     baseControllerContent
   );
 
-  // ---- CONTROLLER (no pisar si existe)
-  const controllerFile = path.join(controllersPath, `${modelFileBase}Controller.js`);
-  if (!fs.existsSync(controllerFile)) {
-    const controllerContent = `import { ${modelFileBase}BaseController as Base } from "./base/${modelFileBase}BaseController.js";
+  /* =========================
+     CONTROLLER (stable, do NOT overwrite)
+     ========================= */
+  const controllerFile = path.join(
+    controllersPath,
+    `${resource}Controller.js`
+  );
 
-export const crear${ModelName.slice(0, -1)} = Base.create;
-export const obtener${ModelName} = Base.getAll;
-export const obtener${ModelName.slice(0, -1)} = Base.getById;
-export const actualizar${ModelName.slice(0, -1)} = Base.update;
-export const eliminar${ModelName.slice(0, -1)} = Base.remove;
+  if (!fs.existsSync(controllerFile)) {
+    const controllerContent = `import { ${resource}BaseController as Base } from "./base/${resource}BaseController.js";
+
+export const crear${Resource} = Base.create;
+export const obtener${Resource} = Base.getAll;
+export const obtener${Resource}PorId = Base.getById;
+export const actualizar${Resource} = Base.update;
+export const eliminar${Resource} = Base.remove;
 `;
+
     fs.writeFileSync(controllerFile, controllerContent);
   }
 
-  // ---- ROUTES (siempre regenerable)
+  /* =========================
+     ROUTES (regenerable)
+     ========================= */
   const routesContent = `import express from "express";
 import {
-  crear${ModelName.slice(0, -1)},
-  obtener${ModelName},
-  obtener${ModelName.slice(0, -1)},
-  actualizar${ModelName.slice(0, -1)},
-  eliminar${ModelName.slice(0, -1)}
-} from "../controllers/${modelFileBase}Controller.js";
+  crear${Resource},
+  obtener${Resource},
+  obtener${Resource}PorId,
+  actualizar${Resource},
+  eliminar${Resource}
+} from "../controllers/${resource}Controller.js";
 
 const router = express.Router();
 
-router.get("/", obtener${ModelName});
-router.get("/:id", obtener${ModelName.slice(0, -1)});
-router.post("/", crear${ModelName.slice(0, -1)});
-router.put("/:id", actualizar${ModelName.slice(0, -1)});
-router.delete("/:id", eliminar${ModelName.slice(0, -1)});
+router.post("/", crear${Resource});
+router.get("/", obtener${Resource});
+router.get("/:id", obtener${Resource}PorId);
+router.put("/:id", actualizar${Resource});
+router.delete("/:id", eliminar${Resource});
 
 export default router;
 `;
-  fs.writeFileSync(path.join(routesPath, `${modelFileBase}Routes.js`), routesContent);
 
-  console.log(`CRUD generado para: ${modelFileBase}`);
+  fs.writeFileSync(
+    path.join(routesPath, `${resource}Routes.js`),
+    routesContent
+  );
+
+  console.log(`CRUD generado para: ${resource}`);
 }
 
-console.log("AutoCRUD completado.");
+console.log("AutoCRUD completado correctamente.");
