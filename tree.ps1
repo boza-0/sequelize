@@ -16,13 +16,16 @@ $SuppressFolderContent = @(
 # Files whose CONTENTS should be suppressed (filename still shown)
 $SuppressFileContent = @(
   'package-lock.json',
-  'tree.ps1'
+  'package.json',
+  '.gitignore'
 )
 
 # File extensions whose CONTENTS should be suppressed (case-insensitive)
 $SuppressFileExtensions = @(
   '.lock',
-  '.log'
+  '.log',
+  '.ps1',
+  '.md'
 )
 
 # Prevent infinite recursion via symlinks/junctions and also avoid duplicating work
