@@ -1,6 +1,6 @@
 import { Sequelize } from "sequelize";
 
-export const sequelize = new Sequelize("api_rest_db", "root", "", {
+export const sequelize = new Sequelize("api_rest_db", "root", "root", {
   host: "localhost",
   dialect: "mysql",
   logging: false
