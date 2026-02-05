@@ -22,3 +22,5 @@ curl -X POST http://localhost:3000/api/log5 -H "Content-Type: application/json" 
 C:\Users\DAM2\images\sequelize>curl http://localhost:3000/api/log5 
 [{"id":1,"description":"holAAAAAAAAA"},{"id":2,"description":"Primer log de prueba"},{"id":3,"description":"Primer log de prueba"},{"id":4,"description":"Primer log de prueba"},{"id":5,"description":"Primer log de prueba"},{"id":6,"description":"Primer log de prueba"}]
 C:\Users\DAM2\images\sequelize>
+
+Y más llamadas http POST y GET que he hecho desde la terminal para interactuar con los demás modelos, hubo problemas con las FK, estuve viendo cómo solucionarlo y ya lo dejé. Pero ya lo hice por curiosidad y que explotara. Yo qué quieres que te diga, si alguna vez tengo coche, seguramente sea en modo MANUAL. Un saludo Carlos. 
